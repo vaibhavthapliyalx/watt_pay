@@ -18,7 +18,8 @@ const GenerateInvoiceScreen = () => {
     currentUnits: '',
     rate: '',
   });
-  const [pdfPath, setPdfPath] = useState<string | null>(null);
+
+  const [previewUri, setPreviewUri] = useState<string>("");
 
   const handleInputChange = (name: keyof InvoiceData, value: string) => {
     setInvoiceData({ ...invoiceData, [name]: value });
@@ -55,15 +56,18 @@ const GenerateInvoiceScreen = () => {
   
     try {
         const pdf = await RNHTMLtoPDF.convert(options);
-        Alert.alert('Success', `Invoice generated successfully!\nSaved as ${options.fileName}.pdf to ${options.directory}`, [
-          { text: 'OK' },
+        if (pdf.filePath) {
+          setPreviewUri(pdf.filePath);
+        }
+        Alert.alert('Success', `Invoice generated successfully!\nSaved to:${pdf.filePath}`, [
+          { text: 'Continue' },
         ]);
-        console.log(pdf.filePath);
+        console.log(pdf);
         // replace console.log with your own logic to display the generated PDF invoice
       } catch (error) {
         console.error(error);
         Alert.alert('Error', 'An error occurred while generating the invoice.', [
-          { text: 'OK' },
+          { text: 'Continue' },
         ]);
       }
   };
@@ -107,6 +111,16 @@ const GenerateInvoiceScreen = () => {
       <TouchableOpacity style={styles.button} onPress={handleGenerateInvoice}>
         <Text style={styles.buttonText}>GENERATE INVOICE</Text>
       </TouchableOpacity>
+      {/* {previewUri && (
+        <PDFView
+        fadeInDuration={250.0}
+        style={styles.pdf}
+        resource={previewUri}
+        resourceType="file"
+        onLoad={() => console.log(`PDF rendered from ${previewUri}`)}
+        onError={() => console.log(`Cannot render PDF ${previewUri}`)}
+      />
+      )} */}
       {/* {pdfPath && (
       <PDFView
         style={styles.pdfView}
@@ -129,6 +143,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     alignContent: 'center',
+  },
+  pdf: {
+    flex: 1,
   },
   logo: {
     width: 400,

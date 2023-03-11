@@ -2,12 +2,13 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import GenerateInvoiceScreen from './android/components/GenerateInvoiceScreen';
 import LoginPage from './android/components/LoginPage';
 
 const App = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <LoginPage navigation={undefined}/>
+      <GenerateInvoiceScreen/>
     </SafeAreaView>
   );
 };
@@ -17,7 +18,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#18272E',
   },
 });
 

@@ -1,7 +1,7 @@
 //--------------- Copyright (c) 2023 WattPay. ---------------//
 
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf'
 
 interface InvoiceData {
@@ -12,7 +12,17 @@ interface InvoiceData {
 // WattPay Logo Image Path.
 const appLogoPath = '../assets/Images/app-name-with-value-proposition-logo.png';
 
-const GenerateInvoiceScreen = () => {
+interface IProps {
+  isDisplayed: boolean,
+  onGeneratePressed: (flag: boolean, filePath: string) => void;
+}
+
+/**
+ * 
+ * @param isDisplayed : Used to handle if this screen should be displayed.
+ * @returns GenerateInvoiceScreenß
+ */
+const GenerateInvoiceScreen = ({onGeneratePressed, isDisplayed}: IProps) => {
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     lastUnits: '',
     currentUnits: '',
@@ -20,6 +30,11 @@ const GenerateInvoiceScreen = () => {
   });
 
   const [previewUri, setPreviewUri] = useState<string>("");
+
+  // UseEffect performed to update state of DisplayScreen.
+  // useEffect(()=>{
+  //   setDisplayScreen(isDisplayed)
+  // },[isDisplayed]);
 
   const handleInputChange = (name: keyof InvoiceData, value: string) => {
     setInvoiceData({ ...invoiceData, [name]: value });
@@ -42,6 +57,13 @@ const GenerateInvoiceScreen = () => {
       <br/>
       <br/>
       <h1> This is just a sample, will improve next.</h1>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <br/>
+      <p> filepath:${previewUri}</p>
     `;
     // For appending date and time, to make unique names on each overwrite.
     const now = new Date();
@@ -56,13 +78,13 @@ const GenerateInvoiceScreen = () => {
   
     try {
         const pdf = await RNHTMLtoPDF.convert(options);
-        if (pdf.filePath) {
-          setPreviewUri(pdf.filePath);
-        }
         Alert.alert('Success', `Invoice generated successfully!\nSaved to:${pdf.filePath}`, [
           { text: 'Continue' },
         ]);
         console.log(pdf);
+        if (pdf.filePath) {
+          onGeneratePressed(true,pdf.filePath);
+        }
         // replace console.log with your own logic to display the generated PDF invoice
       } catch (error) {
         console.error(error);
@@ -73,7 +95,9 @@ const GenerateInvoiceScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <>
+    {isDisplayed &&
+    <SafeAreaView style={styles.container}>
       <Image source={require(appLogoPath)} style={styles.logo}/>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Enter prev units:</Text>
@@ -111,30 +135,9 @@ const GenerateInvoiceScreen = () => {
       <TouchableOpacity style={styles.button} onPress={handleGenerateInvoice}>
         <Text style={styles.buttonText}>GENERATE INVOICE</Text>
       </TouchableOpacity>
-      {/* {previewUri && (
-        <PDFView
-        fadeInDuration={250.0}
-        style={styles.pdf}
-        resource={previewUri}
-        resourceType="file"
-        onLoad={() => console.log(`PDF rendered from ${previewUri}`)}
-        onError={() => console.log(`Cannot render PDF ${previewUri}`)}
-      />
-      )} */}
-      {/* {pdfPath && (
-      <PDFView
-        style={styles.pdfView}
-        path={pdfPath}
-        onLoadComplete={(numberOfPages: any, filePath: any) => {
-          console.log(`Number of pages: ${numberOfPages}`);
-          console.log(`File path: ${filePath}`);
-        }}
-        onError={(error: any) => {
-          console.error(error);
-        }}
-      />
-    )} */}
-    </View>
+    </SafeAreaView>
+    }
+    </>
   );
 };
 

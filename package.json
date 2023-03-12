@@ -12,7 +12,9 @@
   "dependencies": {
     "react": "18.2.0",
     "react-native": "0.71.3",
+    "react-native-blob-util": "^0.17.2",
     "react-native-html-to-pdf": "^0.12.0",
+    "react-native-pdf": "^6.6.2",
     "react-native-splash-screen": "^3.3.0"
   },
   "devDependencies": {

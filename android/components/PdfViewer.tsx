@@ -1,9 +1,9 @@
 //--------------- Copyright (c) 2023 WattPay. ---------------//
 
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, SafeAreaView, Dimensions, Alert, Button} from 'react-native';
+import {StyleSheet, SafeAreaView, Dimensions, Alert, Button} from 'react-native';
 import Pdf from 'react-native-pdf';
-import Share from 'react-native-share'
+import Share from 'react-native-share';
 import ErrorWindow from './ErrorWindow';
 
 type IProps = {
@@ -24,12 +24,12 @@ const PdfViewer = ({filePath, isDisplayed}: IProps) => {
     setShowDialog(true);
   };
   async function handleDialogConfirm () {
-    const options = {
+    const content = {
       type: 'application/pdf',
       message: 'Hello User! your invoice is ready!',
-      url: filePath,
+      url: `file://${filePath}`,
     };
-    await Share.open(options).catch((error)=> {console.log(error)});
+    await Share.open(content).catch((error)=> {console.log(error)});
     setShowDialog(false);
   };
 
@@ -49,7 +49,7 @@ const PdfViewer = ({filePath, isDisplayed}: IProps) => {
         ],
       );
     }
-  },[showDialog])
+  },[showDialog]);
 
   return (
     <SafeAreaView style ={styles.container}>
@@ -65,7 +65,7 @@ const PdfViewer = ({filePath, isDisplayed}: IProps) => {
         <ErrorWindow
         message={`Error 404 File not found.\nPlease ensure that file exists.\nIf this problem persists, please contact the developer.`}
         onDismiss={handleDismissError} isDisplayed={showError} 
-      />
+      /> 
       }
     </SafeAreaView>
   );

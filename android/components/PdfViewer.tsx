@@ -1,8 +1,9 @@
 //--------------- Copyright (c) 2023 WattPay. ---------------//
 
-import React, { useState } from 'react';
-import { View, StyleSheet, SafeAreaView, Dimensions, Alert, Button, Share } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, SafeAreaView, Dimensions, Alert, Button} from 'react-native';
 import Pdf from 'react-native-pdf';
+import Share from 'react-native-share'
 import ErrorWindow from './ErrorWindow';
 
 type IProps = {
@@ -12,39 +13,52 @@ type IProps = {
 
 const PdfViewer = ({filePath, isDisplayed}: IProps) => {
   const [showError, setShowError] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
 
   // handles  disissing error.
   const handleDismissError = () => {
     setShowError(false);
   };
 
-  const handleShare = async (filepath: string) => {
-    try {
-      const result = await Share.share({
-        url: `file://${filepath}`,
-      });
+  function handleShare () {
+    setShowDialog(true);
+  };
+  async function handleDialogConfirm () {
+    const options = {
+      type: 'application/pdf',
+      message: 'Hello User! your invoice is ready!',
+      url: filePath,
+    };
+    await Share.open(options).catch((error)=> {console.log(error)});
+    setShowDialog(false);
+  };
 
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          console.log(`Shared via ${result.activityType}`);
-        } else {
-          console.log('Shared');
-        }
-      } else if (result.action === Share.dismissedAction) {
-        console.log('Dismissed');
-      }
-    } catch (error) {
-      console.error(error);
+  const handleDialogCancel = () => {
+    setShowDialog(false);
+  };
+
+  // UseEffect performed to display the dialog to share.
+  useEffect(()=>{
+    if (showDialog) {
+      Alert.alert(
+        'Confirm Share',
+        'Are you sure you want to share the PDF file?',
+        [
+          {text: 'Cancel', onPress: handleDialogCancel},
+          {text: 'Share', onPress: handleDialogConfirm},
+        ],
+      );
     }
-  }
-  
+  },[showDialog])
+
   return (
     <SafeAreaView style ={styles.container}>
       {isDisplayed &&
         <>
           <Pdf source={{ uri: filePath }}
+          onLoadProgress={(percent)=>{Alert.alert(`Loading ${percent}`)}}
             style={styles.pdf} />
-          <Button title="Share PDF" onPress={() => handleShare('/path/to/myfile.pdf')} />
+          <Button title="Share PDF" onPress={handleShare} />
         </>
       }
       {(!isDisplayed && showError) &&

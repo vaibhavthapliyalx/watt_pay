@@ -174,7 +174,7 @@ const GenerateInvoiceScreen = ({onGeneratePressed, isDisplayed}: IProps) => {
           <p><strong>Invoice Note:</strong></p>
           <p>Please remit payment within 30 days of invoice date. Late payments might be subject to a monthly finance charge. If you have any questions or concerns about this invoice, please contact the sender.</p>
         </div>
-        <footer style="font-size: 14px; color: #999; text-align: center; padding: 10px 0;">&copy; ${now.getFullYear()} WattPay.
+        <footer style="font-size: 14px; color: #999; text-align: center; padding: 10px 0;position: fixed;bottom: 0;left: 0;right: 0;">&copy; ${now.getFullYear()} WattPay.
         All Rights Reserved.<br/>
         Unauthorized duplication or use of any content from this software is strictly prohibited.<br/>This includes but is not limited to text, graphics, logos, images, videos, and other media.<br/>
         Any trademarks, logos, or service marks displayed on this software are the property of their respective owners.</footer>
@@ -183,7 +183,6 @@ const GenerateInvoiceScreen = ({onGeneratePressed, isDisplayed}: IProps) => {
     </html>
     `;
     
-  
     const options = {
       html: invoiceHtml,
       fileName: `watt-pay-invoice-${dateStr}-${timeStr}`,

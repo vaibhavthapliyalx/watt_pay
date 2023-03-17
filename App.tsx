@@ -23,6 +23,12 @@ const App = () => {
 
   const handleTabChange = (tabName: string) => {
     setActiveTab(tabName);
+    if (tabName == 'Home') {
+      setDisplayPdfViewer(false);
+      setDisplayGeneratePdfScreen(true);
+    } else {
+      setDisplayGeneratePdfScreen(false)
+    }
   };
 
   const handleGeneratePressed = (success: boolean, filePath: string) => {
@@ -31,6 +37,7 @@ const App = () => {
       setDisplayPdfViewer(true);
       setDisplayGeneratePdfScreen(false);
       setPdfPath(filePath);
+      setActiveTab('PdfViewer');
     }
   }
   

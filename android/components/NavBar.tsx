@@ -1,6 +1,6 @@
 //--------------- Copyright (c) 2023 WattPay. ---------------//
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface IProps {
@@ -9,9 +9,21 @@ interface IProps {
 }
 
 const NavBar: React.FC<IProps> = ({ activeTab, onChangeTab }) => {
+
+  const [isCurrentlyAtHome, setIsCurrentlyAtHome] = useState(true);
+
+  useEffect(()=>{
+    if (activeTab === 'Home') {
+      setIsCurrentlyAtHome(true);
+    } else {
+      setIsCurrentlyAtHome(false);
+    }
+  })
   return (
+    <>
+    { !isCurrentlyAtHome &&
     <View style={styles.container}>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={[
           styles.tabButton,
           activeTab === 'Home' && styles.activeTabButton,
@@ -26,24 +38,25 @@ const NavBar: React.FC<IProps> = ({ activeTab, onChangeTab }) => {
         >
           Home
         </Text>
-      </TouchableOpacity>
+        </TouchableOpacity>*/}
+        
       <TouchableOpacity
         style={[
           styles.tabButton,
-          activeTab === 'Settings' && styles.activeTabButton,
+          activeTab === 'Home' && styles.activeTabButton,
         ]}
-        onPress={() => onChangeTab('Settings')}
+        onPress={() => onChangeTab('Home')}
       >
         <Text
           style={[
             styles.tabButtonText,
-            activeTab === 'Settings' && styles.activeTabButtonText,
+            activeTab === 'Home' && styles.activeTabButtonText,
           ]}
         >
-          Settings
+          Go Back to Home Screen ?
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={[
           styles.tabButton,
           activeTab === 'About' && styles.activeTabButton,
@@ -58,8 +71,10 @@ const NavBar: React.FC<IProps> = ({ activeTab, onChangeTab }) => {
         >
           About
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
+    }
+    </>
   );
 };
 

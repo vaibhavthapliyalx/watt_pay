@@ -1,4 +1,4 @@
-name: Release Pipeline
+name: Create Release
 
 on:
   push:
@@ -21,9 +21,23 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Get version from package.json
+        id: version
+        run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
+
       - name: Generate release notes
         id: release-notes
         run: npx auto-changelog --stdout
+
+      - name: Create Git tag
+        run: git tag -a ${{ steps.version.outputs.version }} -m "Release ${{ steps.version.outputs.version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Git tag
+        run: git push origin ${{ steps.version.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
@@ -31,5 +45,6 @@ jobs:
           files: |
             android/app/build/outputs/apk/release/*.apk
           body: ${{ steps.release-notes.outputs.stdout }}
+          tag_name: ${{ steps.version.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

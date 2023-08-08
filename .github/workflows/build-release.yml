@@ -1,27 +1,35 @@
 name: Release Pipeline
+
 on:
   push:
     branches:
-      - release/*
+      - 'release/*'
 
 jobs:
-  build-release-asset:
+  create-release:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install npm dependencies
-        run: |
-          npm install --force
-      - name: Read package.json
-        id: package
-        run: echo ::set-output name=apkName::$(node -p "require('./package.json').name")
-      - name: Generate Release Asset
-        run: |
-          # Customize the asset generation logic here
-          echo "Generating release asset..."
 
-      - name: Upload Release Asset
-        uses: actions/upload-artifact@v3.1.2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          name: ${{ steps.package.outputs.apkName }}-release-asset
-          path: path/to/release/asset/directory
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate release notes
+        id: release-notes
+        run: npx auto-changelog --stdout
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            android/app/build/outputs/apk/release/*.apk
+          body: ${{ steps.release-notes.outputs.stdout }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

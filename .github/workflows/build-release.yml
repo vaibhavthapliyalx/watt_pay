@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - 'release/*'
-  pull_request:
-    types:
-      - opened
-      - synchronize
 
 jobs:
   create-release:
@@ -25,18 +21,22 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Configure Git identity
-        run: |
-          git config user.email "${{ secrets.GIT_USER_EMAIL }}"
-          git config user.name "${{ secrets.GIT_USER_NAME }}"
-
       - name: Get version from package.json
         id: version
         run: echo "::set-output name=version::$(node -p "require('./package.json').version")"
+        
+      - name: Get package name from package.json
+        id: package-name
+        run: echo "::set-output name=package-name::$(node -p "require('./package.json').name")"
 
       - name: Generate release notes
         id: release-notes
         run: npx auto-changelog --stdout
+
+      - name: Configure Git identity
+        run: |
+          git config user.email "${{ secrets.GIT_USER_EMAIL }}"
+          git config user.name "${{ secrets.GIT_USER_NAME }}"
 
       - name: Create Git tag
         run: git tag -a ${{ steps.version.outputs.version }} -m "Release ${{ steps.version.outputs.version }}"
@@ -53,7 +53,12 @@ jobs:
         with:
           files: |
             android/app/build/outputs/apk/release/*.apk
-          body: ${{ steps.release-notes.outputs.stdout }}
+          body: |
+            ${{ steps.package-name.outputs.package-name }}
+            What's Changed
+            ${{ steps.release-notes.outputs.stdout }}
+            New Contributors
+            ${{ steps.release-notes.outputs.contributors }}
           tag_name: ${{ steps.version.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

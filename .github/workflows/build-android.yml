@@ -1,0 +1,25 @@
+name: Integration Testing Pipeline
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install npm dependencies
+        run: |
+          npm install --force
+      - name: Read package.json
+        id: package
+        run: echo ::set-output name=apkName::$(node -p "require('./package.json').name")
+      - name: Build Android Release
+        run: |
+          cd android && ./gradlew assembleRelease
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: ${{ steps.package.outputs.apkName }}-beta-test.apk
+          path: android/app/build/outputs/apk/release/

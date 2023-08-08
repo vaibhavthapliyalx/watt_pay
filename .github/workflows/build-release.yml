@@ -1,5 +1,4 @@
-name: Create Release
-
+name: Release Pipeline
 on:
   push:
     branches:
@@ -14,7 +13,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
 
@@ -53,8 +52,10 @@ jobs:
         with:
           files: |
             android/app/build/outputs/apk/release/*.apk
+            README.md
+            CHANGELOG.md
           body: |
-            ${{ steps.package-name.outputs.package-name }}
+            ${{ steps.package-name.outputs.package-name }} Beta
             What's Changed
             ${{ steps.release-notes.outputs.stdout }}
             New Contributors

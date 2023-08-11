@@ -1,5 +1,4 @@
 name: Release Pipeline
-
 on:
   push:
     branches:
@@ -14,7 +13,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
 
@@ -49,22 +48,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
-        id: create_release
-        uses: ncipollo/release-action@v1.11.2
+        uses: softprops/action-gh-release@v1
         with:
-          tag: ${{ steps.version.outputs.version }}
-          name: ${{ steps.package-name.outputs.package-name }} Beta Release V${{ steps.version.outputs.version }}
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload APK Release Asset
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: android/app/build/outputs/apk/release/*.apk
-          asset_name: ${{ steps.package-name.outputs.package-name }}-beta-${{ steps.version.outputs.version }}.apk
-          asset_content_type: application/vnd.android.package-archive
+          files: |
+            android/app/build/outputs/apk/release/*.apk
+            README.md
+            CHANGELOG.md
+          body: |
+            ${{ steps.package-name.outputs.package-name }}
+            What's Changed
+            ${{ steps.release-notes.outputs.stdout }}
+            New Contributors
+            ${{ steps.release-notes.outputs.contributors }}
+          tag_name: ${{ steps.version.outputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
